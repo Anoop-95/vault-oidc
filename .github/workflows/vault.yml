@@ -13,15 +13,25 @@ jobs:
 
     steps:
 
-      - name: Generate GitHub OIDC JWT
+      - name: Generate JWT
         run: |
-          echo "Requesting JWT from GitHub..."
 
-          RESPONSE=$(curl -s \
+          echo "Generating GitHub JWT..."
+
+          JWT=$(curl -s \
             -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=vault")
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=vault" \
+            | jq -r '.value')
 
-          echo "$RESPONSE"
+          echo "$JWT" > jwt-token.txt
+
+          echo "JWT saved into jwt-token.txt"
+
+      - name: Upload JWT Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jwt-token
+          path: jwt-token.txt
 
           JWT=$(echo "$RESPONSE" | jq -r '.value')
 
