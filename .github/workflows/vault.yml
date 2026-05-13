@@ -1,0 +1,30 @@
+name: Vault OIDC Demo
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Generate GitHub OIDC JWT
+        run: |
+          echo "Requesting JWT from GitHub..."
+
+          RESPONSE=$(curl -s \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=vault")
+
+          echo "$RESPONSE"
+
+          JWT=$(echo "$RESPONSE" | jq -r '.value')
+
+          echo ""
+          echo "JWT TOKEN:"
+          echo "$JWT"
